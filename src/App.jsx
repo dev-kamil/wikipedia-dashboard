@@ -7,14 +7,16 @@ function App() {
     "https://pl.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics|usergroups&sinumberingroup&origin=*&format=json";
   const abuseFilterUrl =
     "https://pl.wikipedia.org/w/api.php?action=query&list=abuselog&aflprop=ids|filter|user|title|action|result&format=json&origin=*";
-  const articleBaseUrl = "https://pl.wikipedia.org/wiki/";
+  const wikiBaseUrl = "https://pl.wikipedia.org/wiki/";
   const newArticlesUrl =
     "https://pl.wikipedia.org/w/api.php?action=query&list=recentchanges&rctype=new&rcnamespace=0&rcprop=ids|timestamp|user|title&format=json&origin=*";
-    const newUsersUrl = 'https://pl.wikipedia.org/w/api.php?action=query&list=logevents&letype=newusers&format=json&origin=*'
+  const newUsersUrl =
+    "https://pl.wikipedia.org/w/api.php?action=query&list=logevents&letype=newusers&format=json&origin=*";
 
   const [statistics, setStatistics] = useState();
   const [abusefilter, setAbusefilter] = useState();
   const [newArticles, setNewArticles] = useState();
+  const [newUsers, setNewUsers] = useState();
 
   useEffect(() => {
     fetch(statistictsUrl)
@@ -29,64 +31,83 @@ function App() {
       .then((response) => response.json())
       .then((json) => setNewArticles(json.query.recentchanges))
       .catch((error) => console.error(error));
+    fetch(newUsersUrl)
+      .then((response) => response.json())
+      .then((json) => setNewUsers(json.query.logevents))
+      .catch((error) => console.error(error));
   }, []);
 
   function Statistics() {
     if (!statistics) return <span>Loading...</span>;
-    const articles = statistics.statistics.articles;
-    const users = statistics.statistics.users;
-    const activeUsers = statistics.statistics.activeusers;
-    const admins = statistics.statistics.admins;
+    const articles = statistics.statistics.articles.toLocaleString();
+    const users = statistics.statistics.users.toLocaleString();
+    const activeUsers = statistics.statistics.activeusers.toLocaleString();
+    const admins = statistics.statistics.admins.toLocaleString();
     // Possibly error if no result
     const editors = statistics.usergroups.filter(
       (group) => group.name === "editor"
     )[0].number;
 
     return (
-      <ul>
-        <li>Artykułów: {articles}</li>
-        <li>Użytkowników: {users}</li>
-        <li>Aktywnych użytkowników {activeUsers}</li>
-        <li>Redaktorów {editors}</li>
-        <li>Administratorów: {admins}</li>
-      </ul>
+      // TRANSFORM IT TO OBJECT TO MAP IT
+      <div className="grid gap-4 grid-cols-4">
+        <div className="bg-white rounded p-4 drop-shadow-2xl">
+          <p className="text-slate-500">Articles</p>
+          <p className="font-bold text-2xl">{articles}</p>
+        </div>
+        <div className="bg-white rounded p-4 drop-shadow-2xl">
+          <p className="text-slate-500">Users</p>
+          <p className="font-bold text-2xl">{users}</p>
+        </div>
+        <div className="bg-white rounded p-4 drop-shadow-2xl">
+          <p className="text-slate-500">Editors</p>
+          <p className="font-bold text-2xl">{editors}</p>
+        </div>
+        <div className="bg-white rounded p-4 drop-shadow-2xl">
+          <p className="text-slate-500">Administrators</p>
+          <p className="font-bold text-2xl">{admins}</p>
+        </div>
+      </div>
     );
   }
 
   function Abusefilter() {
     if (!abusefilter) return "Loading...";
     return (
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>User</th>
-            <th>Action</th>
-            <th>Title</th>
-            <th>Filter</th>
-          </tr>
-        </thead>
-        <tbody>
-          {abusefilter.map((abuse) => (
-            <tr key={abuse.id}>
-              <td>{abuse.id}</td>
-              <td>{abuse.user}</td>
-              <td>{abuse.action}</td>
-              <td>
-                <a
-                  href={articleBaseUrl + encodeURI(abuse.title)}
-                  target="_blank"
-                >
-                  {abuse.title.length > 30
-                    ? abuse.title.substring(0, 30 - 3) + "..."
-                    : abuse.title}
-                </a>
-              </td>
-              <td>{abuse.filter}</td>
+      <div className="bg-white rounded p-4 shadow-2xl">
+        <table className="table-auto border rounded w-full">
+          <thead className="bg-slate-100">
+            <tr>
+              <th className="px-4 py-1">#</th>
+              <th className="px-4 py-1">User</th>
+              <th className="px-4 py-1">Action</th>
+              <th className="px-4 py-1">Title</th>
+              <th className="px-4 py-1">Filter</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="text-slate-900">
+            {abusefilter.map((abuse) => (
+              <tr className="even:bg-slate-50 border" key={abuse.id}>
+                <td className="px-4 py-1">{abuse.id}</td>
+                <td className="px-4 py-1">{abuse.user}</td>
+                <td className="px-4 py-1">{abuse.action}</td>
+                <td className="px-4 py-1">
+                  <a
+                    href={wikiBaseUrl + encodeURI(abuse.title)}
+                    className="text-blue-600 underline"
+                    target="_blank"
+                  >
+                    {abuse.title.length > 30
+                      ? abuse.title.substring(0, 30 - 3) + "..."
+                      : abuse.title}
+                  </a>
+                </td>
+                <td className="px-4 py-1">{abuse.filter}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     );
   }
 
@@ -106,11 +127,11 @@ function App() {
           {newArticles.map((article) => (
             <tr key={article.pageid}>
               <td>{article.pageid}</td>
-              <td>{article.timestamp}</td>
+              <td>{new Date(article.timestamp).toLocaleString()}</td>
               <td>{article.user}</td>
               <td>
                 <a
-                  href={articleBaseUrl + encodeURI(article.title)}
+                  href={wikiBaseUrl + encodeURI(article.title)}
                   target="_blank"
                 >
                   {article.title}
@@ -123,16 +144,59 @@ function App() {
     );
   }
 
+  function NewUsers() {
+    if (!newUsers) return "Loading...";
+    return (
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Time diff</th>
+            <th>User</th>
+          </tr>
+        </thead>
+        <tbody>
+          {newUsers.map((user) => (
+            <tr key={`new-user-${user.params.userid}`}>
+              <td>{user.logid}</td>
+              <td>{new Date(user.timestamp).toLocaleString()}</td>
+              <td>
+                {Math.round(
+                  (Date.now() - new Date(user.timestamp).getTime()) / 60000
+                )}{" "}
+                min ago
+              </td>
+              <td>
+                <a href={encodeURI(wikiBaseUrl + user.title)} target="_blank">
+                  {user.user}
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
+
   return (
-    <>
-      <h1>Dashboard</h1>
-      <h2>Statistics</h2>
-      <Statistics />
-      <h2>Abuse Filter</h2>
-      <Abusefilter />
+    <div className="bg-slate-200 w-full">
+      <header className="p-4 bg">
+        <h1 className="text-2xl font-bold tracking-tight">Wikipedia Dashboard</h1>
+      </header>
+      <div className="container m-auto px-4">
+        <h2 className="text-2xl mb-2">Statistics</h2>
+        <Statistics />
+      </div>
+      <div className="container m-auto px-4 mt-4">
+        <h2 className="text-2xl mb-2">Abuse Filter</h2>
+        <Abusefilter />
+      </div>
       <h2>New Articles</h2>
       <NewArticles />
-    </>
+      <h2>New Users</h2>
+      <NewUsers />
+    </div>
   );
 }
 
