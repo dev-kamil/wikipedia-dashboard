@@ -20,11 +20,23 @@ thead {
   }
 
   thead {
-    @apply border-b dark:text-slate-50 dark:border-slate-700;
+    @apply dark:text-slate-50 dark:border-slate-700 bg-violet-600 text-slate-50;
   }
 
   tr {
     @apply border-b last:border-0 hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-700;
+  }
+
+  thead tr {
+    @apply border-0 hover:bg-violet-700 dark:hover:bg-violet-500
+  }
+
+  th:first-of-type {
+    @apply rounded-s-md
+  }
+
+  th:last-of-type {
+    @apply rounded-e-md
   }
 
   th, td {
@@ -32,7 +44,7 @@ thead {
   }
 
   a {
-    @apply text-violet-700 underline dark:text-violet-200;
+    @apply text-violet-600 dark:text-violet-400 underline decoration-violet-600 dark:decoration-violet-400;
   }
 
   a:visited {

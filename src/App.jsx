@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
 import "./App.css";
 
 function App() {
@@ -13,10 +14,16 @@ function App() {
   const newUsersUrl =
     "https://pl.wikipedia.org/w/api.php?action=query&list=logevents&letype=newusers&format=json&origin=*";
 
+  const moonIcon = <MoonIcon className="h-6 w-6 text-slate-500" />;
+  const sunIcon = <SunIcon className="h-6 w-6 dark:text-slate-500" />;
+
   const [statistics, setStatistics] = useState();
   const [abusefilter, setAbusefilter] = useState();
   const [newArticles, setNewArticles] = useState();
   const [newUsers, setNewUsers] = useState();
+  const [themeIcon, setThemeIcon] = useState(
+    localStorage.theme === "light" ? moonIcon : sunIcon
+  );
 
   useEffect(() => {
     fetch(statistictsUrl)
@@ -37,6 +44,7 @@ function App() {
       .catch((error) => console.error(error));
   }, []);
 
+  console.log('Load')
   if (
     localStorage.theme === "dark" ||
     (!("theme" in localStorage) &&
@@ -78,7 +86,7 @@ function App() {
         {Object.entries(stats).map(([k, v]) => (
           <div
             key={`stats-${k}`}
-            className="bg-white rounded-lg p-4 drop-shadow-2xl hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700"
+            className="bg-white rounded-lg p-4 drop-shadow-2xl hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700"
           >
             <p className="text-slate-500 dark:text-slate-400">{k}</p>
             <p className="font-bold text-2xl dark:text-slate-50">{v}</p>
@@ -95,7 +103,6 @@ function App() {
         <table>
           <thead>
             <tr>
-              <th>#</th>
               <th>User</th>
               <th>Action</th>
               <th>Title</th>
@@ -105,7 +112,6 @@ function App() {
           <tbody>
             {abusefilter.map((abuse) => (
               <tr key={abuse.id}>
-                <td>{abuse.id}</td>
                 <td>
                   <a href={getUserUrl(abuse.user)}>{abuse.user}</a>
                 </td>
@@ -133,7 +139,6 @@ function App() {
         <table>
           <thead>
             <tr>
-              <th>#</th>
               <th>Date</th>
               <th>User</th>
               <th>Title</th>
@@ -142,14 +147,15 @@ function App() {
           <tbody>
             {newArticles.map((article) => (
               <tr key={article.pageid}>
-                <td>{article.pageid}</td>
                 <td>{new Date(article.timestamp).toLocaleString()}</td>
                 <td>
                   <a href={getUserUrl(article.user)}>{article.user}</a>
                 </td>
                 <td>
                   <a href={getArticleUrl(article.title)} target="_blank">
-                    {article.title}
+                    {article.title.length > 40
+                      ? article.title.substring(0, 40 - 3) + "..."
+                      : article.title}
                   </a>
                 </td>
               </tr>
@@ -205,24 +211,27 @@ function App() {
         } else localStorage.theme = "light";
       } else if (localStorage.theme === "dark") {
         localStorage.theme = "light";
-        document.documentElement.classList.remove("dark");
+        setThemeIcon(moonIcon)
       } else {
         localStorage.theme = "dark";
-        document.documentElement.classList.add("dark");
+        setThemeIcon(sunIcon)
       }
     }
 
     return (
-        <button className="dark:text-slate-400" onClick={handleClick}>
-          Switch dark mode
-        </button>
+      <button className="dark:text-slate-400" onClick={handleClick}>
+        {themeIcon}
+      </button>
     );
   }
 
   return (
-    <div className="bg-slate-200 dark:bg-slate-900 w-full min-h-screen transition ease-out duration-300">
+    <div className="bg-slate-100 dark:bg-slate-900 w-full min-h-screen transition ease-out duration-300">
       <header className="px-4 py-8 container m-auto sm:flex justify-between items-center">
-        <h1 className="text-2xl font-bold tracking-tight text-violet-700 dark:text-violet-200">
+        <h1
+          className="text-2xl font-bold tracking-tight text-transparent bg-gradient-to-r bg-clip-text from-purple-800 via-purple-600 to-purple-800
+        dark:from-purple-300 dark:via-purple-200 dark:to-purple-300"
+        >
           Wikipedia Dashboard
         </h1>
         <DarkModeSwitch />
