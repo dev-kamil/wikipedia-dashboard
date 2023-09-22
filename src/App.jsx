@@ -2,8 +2,17 @@ import { useEffect, useState } from "react";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
 import "./App.css";
 
+// TODO
+// - Separate components
+// - Refresh button to update data
+// - Compare current statistics to previous day (wikistats)
+// - Placeholder while requesting data
+// Optionally
+// - Automatically refresh data
+// - Highlight new changes
+// - Charts based on data from wikistats
+
 function App() {
-  // Liczba artykułów, użytkowników, aktywnych użytkowników, administratorów, redaktorów
   const statistictsUrl =
     "https://pl.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics|usergroups&sinumberingroup&origin=*&format=json";
   const abuseFilterUrl =
@@ -44,7 +53,6 @@ function App() {
       .catch((error) => console.error(error));
   }, []);
 
-  console.log('Load')
   if (
     localStorage.theme === "dark" ||
     (!("theme" in localStorage) &&
@@ -211,10 +219,10 @@ function App() {
         } else localStorage.theme = "light";
       } else if (localStorage.theme === "dark") {
         localStorage.theme = "light";
-        setThemeIcon(moonIcon)
+        setThemeIcon(moonIcon);
       } else {
         localStorage.theme = "dark";
-        setThemeIcon(sunIcon)
+        setThemeIcon(sunIcon);
       }
     }
 
