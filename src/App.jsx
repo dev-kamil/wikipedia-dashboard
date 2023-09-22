@@ -37,36 +37,53 @@ function App() {
       .catch((error) => console.error(error));
   }, []);
 
+  if (
+    localStorage.theme === "dark" ||
+    (!("theme" in localStorage) &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
+  ) {
+    document.documentElement.classList.add("dark");
+    localStorage.theme = "dark";
+  } else {
+    document.documentElement.classList.remove("dark");
+    localStorage.theme = "light";
+  }
+
+  function getArticleUrl(article) {
+    return encodeURI(wikiBaseUrl + article);
+  }
+
+  function getUserUrl(user) {
+    return encodeURI(wikiBaseUrl + "Wikipedysta:" + user);
+  }
+
   function Statistics() {
     if (!statistics) return <span>Loading...</span>;
     const articles = statistics.statistics.articles.toLocaleString();
     const users = statistics.statistics.users.toLocaleString();
     const activeUsers = statistics.statistics.activeusers.toLocaleString();
     const admins = statistics.statistics.admins.toLocaleString();
-    // Possibly error if no result
     const editors = statistics.usergroups.filter(
       (group) => group.name === "editor"
     )[0].number;
+    const stats = {
+      Articles: articles,
+      Users: users,
+      Administrators: admins,
+      Editors: editors,
+    };
 
     return (
-      // TRANSFORM IT TO OBJECT TO MAP IT
-      <div className="grid gap-4 grid-cols-4">
-        <div className="bg-white rounded-lg p-4 drop-shadow-2xl transition-shadow duration-300 ease-in-out hover:shadow-2xl hover:shadow-blue-700/30">
-          <p className="text-slate-500">Articles</p>
-          <p className="font-bold text-2xl">{articles}</p>
-        </div>
-        <div className="bg-white rounded-lg p-4 drop-shadow-2xl">
-          <p className="text-slate-500">Users</p>
-          <p className="font-bold text-2xl">{users}</p>
-        </div>
-        <div className="bg-white rounded-lg p-4 drop-shadow-2xl">
-          <p className="text-slate-500">Editors</p>
-          <p className="font-bold text-2xl">{editors}</p>
-        </div>
-        <div className="bg-white rounded-lg p-4 drop-shadow-2xl">
-          <p className="text-slate-500">Administrators</p>
-          <p className="font-bold text-2xl">{admins}</p>
-        </div>
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+        {Object.entries(stats).map(([k, v]) => (
+          <div
+            key={`stats-${k}`}
+            className="bg-white rounded-lg p-4 drop-shadow-2xl hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700"
+          >
+            <p className="text-slate-500 dark:text-slate-400">{k}</p>
+            <p className="font-bold text-2xl dark:text-slate-50">{v}</p>
+          </div>
+        ))}
       </div>
     );
   }
@@ -74,35 +91,33 @@ function App() {
   function Abusefilter() {
     if (!abusefilter) return "Loading...";
     return (
-      <div className="bg-white rounded-lg p-4 shadow-2xl overflow-y-auto">
-        <table className="table-auto rounded-lg w-full">
-          <thead className="border-b">
+      <div className="table-card">
+        <table>
+          <thead>
             <tr>
-              <th className="px-4 py-1">#</th>
-              <th className="px-4 py-1">User</th>
-              <th className="px-4 py-1">Action</th>
-              <th className="px-4 py-1">Title</th>
-              <th className="px-4 py-1">Filter</th>
+              <th>#</th>
+              <th>User</th>
+              <th>Action</th>
+              <th>Title</th>
+              <th>Filter</th>
             </tr>
           </thead>
-          <tbody className="text-slate-900">
+          <tbody>
             {abusefilter.map((abuse) => (
-              <tr className="border-b last:border-0 hover:bg-slate-100 " key={abuse.id}>
-                <td className="px-4 py-1">{abuse.id}</td>
-                <td className="px-4 py-1">{abuse.user}</td>
-                <td className="px-4 py-1">{abuse.action}</td>
-                <td className="px-4 py-1">
-                  <a
-                    href={wikiBaseUrl + encodeURI(abuse.title)}
-                    className="text-violet-800 underline"
-                    target="_blank"
-                  >
+              <tr key={abuse.id}>
+                <td>{abuse.id}</td>
+                <td>
+                  <a href={getUserUrl(abuse.user)}>{abuse.user}</a>
+                </td>
+                <td>{abuse.action}</td>
+                <td>
+                  <a href={getArticleUrl(abuse.title)} target="_blank">
                     {abuse.title.length > 30
                       ? abuse.title.substring(0, 30 - 3) + "..."
                       : abuse.title}
                   </a>
                 </td>
-                <td className="px-4 py-1">{abuse.filter}</td>
+                <td>{abuse.filter}</td>
               </tr>
             ))}
           </tbody>
@@ -114,88 +129,120 @@ function App() {
   function NewArticles() {
     if (!newArticles) return "Loading...";
     return (
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Date</th>
-            <th>User</th>
-            <th>Title</th>
-          </tr>
-        </thead>
-        <tbody>
-          {newArticles.map((article) => (
-            <tr key={article.pageid}>
-              <td>{article.pageid}</td>
-              <td>{new Date(article.timestamp).toLocaleString()}</td>
-              <td>{article.user}</td>
-              <td>
-                <a
-                  href={wikiBaseUrl + encodeURI(article.title)}
-                  target="_blank"
-                >
-                  {article.title}
-                </a>
-              </td>
+      <div className="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>User</th>
+              <th>Title</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {newArticles.map((article) => (
+              <tr key={article.pageid}>
+                <td>{article.pageid}</td>
+                <td>{new Date(article.timestamp).toLocaleString()}</td>
+                <td>
+                  <a href={getUserUrl(article.user)}>{article.user}</a>
+                </td>
+                <td>
+                  <a href={getArticleUrl(article.title)} target="_blank">
+                    {article.title}
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     );
   }
 
   function NewUsers() {
     if (!newUsers) return "Loading...";
     return (
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Date</th>
-            <th>Time diff</th>
-            <th>User</th>
-          </tr>
-        </thead>
-        <tbody>
-          {newUsers.map((user) => (
-            <tr key={`new-user-${user.params.userid}`}>
-              <td>{user.logid}</td>
-              <td>{new Date(user.timestamp).toLocaleString()}</td>
-              <td>
-                {Math.round(
-                  (Date.now() - new Date(user.timestamp).getTime()) / 60000
-                )}{" "}
-                min ago
-              </td>
-              <td>
-                <a href={encodeURI(wikiBaseUrl + user.title)} target="_blank">
-                  {user.user}
-                </a>
-              </td>
+      <div className="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Time diff</th>
+              <th>User</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {newUsers.map((user) => (
+              <tr key={`new-user-${user.params.userid}`}>
+                <td>{user.params.userid}</td>
+                <td>{new Date(user.timestamp).toLocaleString()}</td>
+                <td>
+                  {Math.round(
+                    (Date.now() - new Date(user.timestamp).getTime()) / 60000
+                  )}{" "}
+                  min ago
+                </td>
+                <td>
+                  <a href={getUserUrl(user.user)} target="_blank">
+                    {user.user}
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  function DarkModeSwitch() {
+    function handleClick() {
+      if (!localStorage.theme) {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          localStorage.theme = "dark";
+        } else localStorage.theme = "light";
+      } else if (localStorage.theme === "dark") {
+        localStorage.theme = "light";
+        document.documentElement.classList.remove("dark");
+      } else {
+        localStorage.theme = "dark";
+        document.documentElement.classList.add("dark");
+      }
+    }
+
+    return (
+        <button className="dark:text-slate-400" onClick={handleClick}>
+          Switch dark mode
+        </button>
     );
   }
 
   return (
-    <div className="bg-slate-200 w-full">
-      <header className="p-4 container m-auto">
-        <h1 className="text-2xl font-bold tracking-tight text-violet-700">Wikipedia Dashboard</h1>
+    <div className="bg-slate-200 dark:bg-slate-900 w-full min-h-screen transition ease-out duration-300">
+      <header className="px-4 py-8 container m-auto sm:flex justify-between items-center">
+        <h1 className="text-2xl font-bold tracking-tight text-violet-700 dark:text-violet-200">
+          Wikipedia Dashboard
+        </h1>
+        <DarkModeSwitch />
       </header>
       <div className="container m-auto px-4">
-        <h2 className="text-2xl mb-2">Statistics</h2>
+        <h2>Statistics</h2>
         <Statistics />
       </div>
       <div className="container m-auto px-4 mt-4">
-        <h2 className="text-2xl mb-2">Abuse Filter</h2>
+        <h2>Abuse Filter</h2>
         <Abusefilter />
       </div>
-      <h2>New Articles</h2>
-      <NewArticles />
-      <h2>New Users</h2>
-      <NewUsers />
+      <div className="container m-auto px-4 mt-4">
+        <h2>New Articles</h2>
+        <NewArticles />
+      </div>
+      <div className="container m-auto px-4 mt-4 pb-12">
+        <h2>New Users</h2>
+        <NewUsers />
+      </div>
     </div>
   );
 }

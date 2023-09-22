@@ -5,3 +5,41 @@
 thead {
   text-align: left;
 }
+
+@layer components {
+  h2 {
+    @apply text-2xl mb-2 dark:text-slate-50
+  }
+
+  table {
+    @apply table-auto rounded-lg w-full;
+  }
+
+  tbody {
+    @apply text-slate-900 dark:text-slate-100;
+  }
+
+  thead {
+    @apply border-b dark:text-slate-50 dark:border-slate-700;
+  }
+
+  tr {
+    @apply border-b last:border-0 hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-700;
+  }
+
+  th, td {
+    @apply px-4 py-1;
+  }
+
+  a {
+    @apply text-violet-700 underline dark:text-violet-200;
+  }
+
+  a:visited {
+    @apply text-slate-700 underline dark:text-slate-300
+  }
+
+  .table-card {
+    @apply bg-white rounded-lg p-4 shadow-2xl overflow-y-auto dark:bg-slate-800;
+  }
+}
