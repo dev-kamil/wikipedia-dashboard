@@ -44,11 +44,7 @@ thead {
   }
 
   a {
-    @apply text-violet-600 dark:text-violet-400 underline decoration-violet-600 dark:decoration-violet-400;
-  }
-
-  a:visited {
-    @apply text-slate-700 underline dark:text-slate-300
+    @apply text-violet-600 dark:text-violet-400 underline decoration-violet-600 dark:decoration-violet-400 visited:dark:text-slate-400 visited:text-slate-600 visited:underline
   }
 
   .table-card {
