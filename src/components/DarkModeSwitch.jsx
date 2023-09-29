@@ -3,7 +3,7 @@ import { useState } from "react";
 
 const DarkModeSwitch = () => {
   const moonIcon = <MoonIcon className="h-6 w-6 text-slate-500" />;
-  const sunIcon = <SunIcon className="h-6 w-6 dark:text-slate-500" />;
+  const sunIcon = <SunIcon className="h-6 w-6 dark:text-slate-400" />;
 
   const [themeIcon, setThemeIcon] = useState(
     localStorage.theme === "light" ? moonIcon : sunIcon
