@@ -20,14 +20,12 @@ import DarkModeSwitch from "./components/DarkModeSwitch";
 // [] Charts based on data from wikistats
 
 function App() {
-  const statistictsUrl =
-    "https://pl.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics|usergroups&sinumberingroup&origin=*&format=json";
-  const abuseFilterUrl =
-    "https://pl.wikipedia.org/w/api.php?action=query&list=abuselog&aflprop=ids|filter|user|title|action|result&format=json&origin=*";
-  const newArticlesUrl =
-    "https://pl.wikipedia.org/w/api.php?action=query&list=recentchanges&rctype=new&rcnamespace=0&rcprop=ids|timestamp|user|title&format=json&origin=*";
-  const newUsersUrl =
-    "https://pl.wikipedia.org/w/api.php?action=query&list=logevents&letype=newusers&format=json&origin=*";
+  // Language code en for en.wikipedia, pl for pl.wikipedia
+  const project = "pl";
+  const statistictsUrl = `https://${project}.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics|usergroups&sinumberingroup&origin=*&format=json`;
+  const abuseFilterUrl = `https://${project}.wikipedia.org/w/api.php?action=query&list=abuselog&aflprop=ids|filter|user|title|action|result&format=json&origin=*`;
+  const newArticlesUrl = `https://${project}.wikipedia.org/w/api.php?action=query&list=recentchanges&rctype=new&rcnamespace=0&rcprop=ids|timestamp|user|title&format=json&origin=*`;
+  const newUsersUrl = `https://${project}.wikipedia.org/w/api.php?action=query&list=logevents&letype=newusers&format=json&origin=*`;
 
   const [statistics, setStatistics] = useState();
   const [abuseFilter, setAbuseFilter] = useState();
@@ -65,7 +63,7 @@ function App() {
   return (
     <div className="bg-slate-100 dark:bg-slate-900 w-full min-h-screen transition ease-out duration-300">
       <header className="sticky top-0 bg-slate-100 dark:bg-slate-900 z-10">
-        <div className="container px-4 py-8 m-auto sm:flex justify-between items-center">
+        <div className="container px-4 py-8 m-auto flex flex-wrap gap-x-4 gap-y-2 justify-between items-center">
           <h1
             className="text-2xl font-bold tracking-tight text-transparent bg-gradient-to-r bg-clip-text from-purple-800 via-purple-600 to-purple-800
             dark:from-purple-300 dark:via-purple-200 dark:to-purple-300"
@@ -74,11 +72,11 @@ function App() {
           </h1>
           <div className="flex items-center gap-4">
             <button
-              className="flex items-center gap-2 text-slate-50 bg-violet-600 rounded px-2 py-1 shadow-xl shadow-violet-600/30 hover:shadow-violet-600/50 transition duration-300 disabled:opacity-50"
+              className="flex items-center gap-1 text-slate-50 bg-violet-600 rounded px-2 py-1 shadow-xl shadow-violet-600/30 hover:shadow-violet-600/50 transition duration-300 disabled:opacity-50"
               onClick={refreshData}
               disabled={isRefreshDisabled}
             >
-              <ArrowPathIcon className="w-6 h-6 -mb-0.5 " />
+              <ArrowPathIcon className="w-5 h-5 -mb-0.5 " />
               <span>Refresh</span>
             </button>
             <DarkModeSwitch />

@@ -3,11 +3,10 @@ const Statistics = ({statistics}) => {
 
   const articles = statistics.statistics.articles.toLocaleString();
   const users = statistics.statistics.users.toLocaleString();
-  // const activeUsers = statistics.statistics.activeusers.toLocaleString();
   const admins = statistics.statistics.admins.toLocaleString();
   const editors = statistics.usergroups.filter(
     (group) => group.name === "editor"
-  )[0].number;
+  )[0]?.number;
 
   const stats = {
     Articles: articles,
