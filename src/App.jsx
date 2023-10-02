@@ -12,12 +12,12 @@ import DarkModeSwitch from "./components/DarkModeSwitch";
 // TODO:
 // [+] Separate components
 // [+] Refresh button to update data
-// [] Compare current statistics to previous day (wikistats)
-// [] Placeholder while requesting data
+// [ ] Compare current statistics to previous day (wikistats)
+// [ ] Placeholder while requesting data
 // Optionally:
-// [] Automatically refresh data
-// [] Highlight new changes
-// [] Charts based on data from wikistats
+// [ ] Automatically refresh data
+// [ ] Highlight new changes
+// [ ] Charts based on data from wikistats
 
 function App() {
   // Language code en for en.wikipedia, pl for pl.wikipedia
@@ -31,16 +31,16 @@ function App() {
   const [abuseFilter, setAbuseFilter] = useState();
   const [newArticles, setNewArticles] = useState();
   const [newUsers, setNewUsers] = useState();
-  const [isRefreshDisabled, setIsRefeshDisabled] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     refreshData();
   }, []);
 
   const refreshData = () => {
-    setIsRefeshDisabled(true);
+    setIsRefreshing(true);
     setTimeout(() => {
-      setIsRefeshDisabled(false);
+      setIsRefreshing(false);
     }, 1000);
     fetch(statistictsUrl)
       .then((response) => response.json())
@@ -74,9 +74,9 @@ function App() {
             <button
               className="flex items-center gap-1 text-slate-50 bg-violet-600 rounded px-2 py-1 shadow-xl shadow-violet-600/30 hover:shadow-violet-600/50 transition duration-300 disabled:opacity-50"
               onClick={refreshData}
-              disabled={isRefreshDisabled}
+              disabled={isRefreshing}
             >
-              <ArrowPathIcon className="w-5 h-5 -mb-0.5 " />
+              <ArrowPathIcon className={`w-5 h-5 -mb-0.5 ${isRefreshing ? "animate-spin" : ""}`} />
               <span>Refresh</span>
             </button>
             <DarkModeSwitch />
