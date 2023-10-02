@@ -7,7 +7,7 @@ A dashboard is designed to make easier supervise real-time changes made on Wikip
 ## Installation
 1. Clone the repo
    ```sh
-   git clone https://github.com/your_username_/Project-Name.git
+   git clone https://github.com/dev-kamil/wikipedia-dashboard
    ```
 2. Install NPM packages
    ```sh
